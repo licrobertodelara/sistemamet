@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Metalife · Primera Cita</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F7FA;color:#1A1A2E;min-height:100vh;}
+.app{max-width:720px;margin:0 auto;padding:1rem;}
+
+/* ══ PRESENTACIÓN ══ */
+.pres-screen{display:none;min-height:90vh;border-radius:16px;overflow:hidden;margin-bottom:1rem;position:relative;}
+.pres-screen.active{display:flex;flex-direction:column;}
+
+/* Pantalla 1 - MetLife */
+.p1{background-color:#002D72 !important;background:#002D72 !important;}
+.p1-logo{display:flex;align-items:center;gap:12px;padding:2rem 2rem 0;}
+.p1-icon{width:52px;height:52px;background:#97C123;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#002D72;}
+.p1-brand{color:#fff;}
+.p1-brand-name{font-size:22px;font-weight:700;color:#ffffff !important;}
+.p1-brand-sub{font-size:13px;color:rgba(255,255,255,0.7) !important;}
+.p1-content{flex:1;display:flex;flex-direction:column;justify-content:center;padding:2rem;}
+.p1-headline{font-size:36px;font-weight:700;color:#ffffff !important;line-height:1.2;margin-bottom:1rem;}
+.p1-headline span{color:#97C123 !important;}
+.p1-sub{font-size:15px;color:rgba(255,255,255,0.9) !important;margin-bottom:2rem;line-height:1.6;}
+.p1-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem;}
+.p1-fact{background:rgba(255,255,255,0.15) !important;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px;}
+.p1-fact-num{font-size:24px;font-weight:700;color:#97C123 !important;}
+.p1-fact-label{font-size:12px;color:rgba(255,255,255,0.85) !important;margin-top:2px;}
+.p1-footer{font-size:12px;color:rgba(255,255,255,0.7) !important;padding:1rem 2rem 2rem;}
+
+/* Pantalla 2 - Asesor */
+.p2{background:#fff;}
+.p2-top{background:#002D72;padding:1.5rem 2rem;}
+.p2-top-title{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px;}
+.p2-top-name{font-size:24px;font-weight:700;color:#fff;}
+.p2-content{padding:1.5rem 2rem;flex:1;}
+.p2-photo{width:110px;height:110px;border-radius:50%;background:#E4EAF4;border:3px solid #97C123;display:flex;align-items:center;justify-content:center;font-size:13px;color:#5A6A7E;margin-bottom:1.25rem;overflow:hidden;cursor:pointer;position:relative;}
+.p2-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.p2-photo-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(0,45,114,0.7);color:#fff;font-size:10px;text-align:center;padding:4px;border-radius:0 0 50% 50%;}
+.p2-edit-mode .p2-info-display{display:none;}
+.p2-edit-mode .p2-info-edit{display:block;}
+.p2-info-display{display:block;}
+.p2-info-edit{display:none;}
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #E4EAF4;}
+.info-row:last-child{border-bottom:none;}
+.info-icon{font-size:18px;flex-shrink:0;margin-top:2px;}
+.info-label{font-size:11px;color:#5A6A7E;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
+.info-val{font-size:14px;font-weight:600;color:#1A1A2E;}
+.info-val.placeholder{color:#B0B8C8;font-weight:400;font-style:italic;}
+.p2-edit-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:7px 14px;border:1px solid #D1D9E8;border-radius:8px;cursor:pointer;background:#F5F7FA;color:#5A6A7E;margin-top:1rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:480px){.g2{grid-template-columns:1fr;}}
+.f{display:flex;flex-direction:column;gap:4px;margin-bottom:2px;}
+.f.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:600;color:#5A6A7E;text-transform:uppercase;letter-spacing:0.05em;}
+input[type=text],input[type=number],input[type=file],textarea,select{width:100%;padding:9px 11px;border:1px solid #D1D9E8;border-radius:8px;font-size:13px;background:#fff;color:#1A1A2E;font-family:inherit;}
+textarea{resize:vertical;min-height:58px;line-height:1.5;}
+input:focus,textarea:focus{outline:none;border-color:#002D72;box-shadow:0 0 0 3px rgba(0,45,114,0.1);}
+input[readonly]{background:#F5F7FA;color:#5A6A7E;}
+.save-btn{background:#002D72;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;}
+
+/* Pantalla 3 - Áreas */
+.p3{background:#F5F7FA;}
+.p3-top{background:#002D72;padding:1.5rem 2rem;}
+.p3-top-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;}
+.p3-top-sub{font-size:13px;color:rgba(255,255,255,0.65);}
+.p3-content{padding:1rem 1rem;flex:1;}
+.p3-instruccion{font-size:13px;color:#5A6A7E;margin-bottom:1rem;text-align:center;font-style:italic;}
+.areas-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+@media(max-width:480px){.areas-grid{grid-template-columns:1fr;}}
+.area-card{background:#fff;border:2px solid #E4EAF4;border-radius:12px;padding:14px;cursor:pointer;transition:all 0.15s;}
+.area-card.selected{border-color:var(--ac);background:var(--ab);}
+.area-icon{font-size:24px;margin-bottom:8px;}
+.area-title{font-size:13px;font-weight:700;color:#1A1A2E;margin-bottom:4px;}
+.area-desc{font-size:12px;color:#5A6A7E;line-height:1.45;}
+.area-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:8px;padding:3px 8px;border-radius:10px;display:inline-block;}
+.sel-counter{text-align:center;font-size:13px;color:#5A6A7E;margin-bottom:1rem;}
+.sel-counter strong{color:#002D72;}
+
+/* Navegación presentación */
+.pres-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;background:rgba(0,0,0,0.25) !important;}
+.pres-nav.light{background:#E4EAF4;}
+.pres-dots{display:flex;gap:8px;}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4) !important;}
+.dot.dark{background:#C8D4E8;}
+.dot.active{background:#97C123;width:24px;border-radius:4px;}
+.dot.dark.active{background:#002D72;}
+.pres-btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.pres-btn.white{background:#fff;color:#002D72;}
+.pres-btn.navy{background:#002D72;color:#fff;}
+.pres-btn.lime{background:#97C123;color:#fff;}
+.pres-btn.outline{background:transparent;border:2px solid #002D72;color:#002D72;}
+
+/* ══ SISTEMA DE CITA ══ */
+.sistema{display:none;}
+.sistema.active{display:block;}
+.topbar{display:flex;align-items:center;justify-content:space-between;background:#002D72;border-radius:12px;padding:12px 16px;margin-bottom:1rem;}
+.brand{display:flex;align-items:center;gap:10px;}
+.bi{width:36px;height:36px;background:#97C123;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#002D72;}
+.bn{font-size:14px;font-weight:700;color:#fff;}
+.bs{font-size:11px;color:rgba(255,255,255,0.6);}
+.slbl{font-size:12px;color:rgba(255,255,255,0.7);}
+.prog{display:flex;margin-bottom:1rem;border-radius:10px;overflow:hidden;border:1px solid #E4EAF4;}
+.pi{flex:1;padding:8px 4px;text-align:center;font-size:10px;cursor:pointer;border-right:1px solid #E4EAF4;color:#5A6A7E;background:#fff;}
+.pi:last-child{border-right:none;}
+.pi.done{background:#EEF3FF;color:#002D72;}
+.pi.active{background:#002D72;color:#fff;font-weight:600;}
+.pi-n{font-size:14px;font-weight:600;display:block;margin-bottom:2px;}
+.sec{display:none;}
+.sec.active{display:block;}
+.card{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid #E4EAF4;}
+.st{font-size:17px;font-weight:600;color:#1A1A2E;margin-bottom:3px;}
+.ss{font-size:12px;color:#5A6A7E;margin-bottom:1rem;}
+.tip{border-radius:0 10px 10px 0;padding:10px 12px;font-size:12px;line-height:1.65;margin-bottom:1rem;}
+.tip.blue{background:#EEF3FF;border-left:3px solid #002D72;color:#0C447C;}
+.tip.green{background:#EAF3DE;border-left:3px solid #0F6E56;color:#27500A;}
+.tip.gold{background:#FAEEDA;border-left:3px solid #F5A623;color:#633806;}
+.tip.red{background:#FCEBEB;border-left:3px solid #C0392B;color:#791F1F;}
+.tip.big{font-size:13px;line-height:1.8;}
+.rg{display:flex;gap:6px;flex-wrap:wrap;}
+.rb{padding:6px 12px;border:1px solid #D1D9E8;border-radius:8px;font-size:12px;cursor:pointer;color:#5A6A7E;background:#fff;white-space:nowrap;}
+.rb.on{border-color:#002D72;background:#EEF3FF;color:#002D72;font-weight:600;}
+.rb.on.red{border-color:#C0392B;background:#FCEBEB;color:#791F1F;}
+.rb.on.green{border-color:#0F6E56;background:#EAF3DE;color:#27500A;}
+.rb.on.gold{border-color:#F5A623;background:#FAEEDA;color:#633806;}
+.divider{height:1px;background:#E4EAF4;margin:1rem 0;}
+.sec-lbl{font-size:11px;font-weight:600;color:#5A6A7E;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
+.sig{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:#F5F7FA;border-radius:8px;margin-bottom:6px;font-size:12px;color:#5A6A7E;}
+.sd{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.btn-row{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap;}
+.btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #D1D9E8;background:#fff;color:#1A1A2E;}
+.btn:hover{background:#F5F7FA;}
+.btn.navy{background:#002D72;color:#fff;border-color:#002D72;}
+.btn.lime{background:#97C123;color:#fff;border-color:#97C123;}
+.btn.sm{padding:7px 14px;font-size:12px;}
+.auto-b{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;background:#EAF3DE;color:#3B6D11;font-weight:600;margin-left:6px;}
+.qb{background:#F5F7FA;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.qt{font-size:13px;font-weight:600;color:#1A1A2E;margin-bottom:8px;line-height:1.5;}
+.mb{border:1px solid #E4EAF4;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+.mh{font-size:12px;font-weight:600;color:#5A6A7E;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.md{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.chip{padding:5px 10px;border:1px solid #D1D9E8;border-radius:20px;font-size:11px;cursor:pointer;color:#5A6A7E;background:#fff;}
+.chip.on{border-color:#002D72;background:#EEF3FF;color:#002D72;font-weight:600;}
+.pres-block{border:1px solid #E4EAF4;border-radius:10px;padding:14px;margin-bottom:10px;}
+.pres-title{font-size:13px;font-weight:600;color:#1A1A2E;margin-bottom:4px;}
+.pres-sub{font-size:12px;color:#5A6A7E;margin-bottom:10px;line-height:1.5;font-style:italic;}
+.diag-wrap{border:1px solid #E4EAF4;border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.diag-hdr{background:#002D72;color:#fff;padding:10px 14px;font-size:12px;font-weight:600;}
+.diag-body{padding:12px 14px;}
+.diag-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #E4EAF4;font-size:13px;}
+.diag-row:last-child{border-bottom:none;}
+.diag-key{color:#5A6A7E;font-size:12px;}
+.diag-val{font-weight:600;}
+.brecha-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.bc{border-radius:8px;padding:12px;text-align:center;}
+.bc.ideal{background:#EEF3FF;border:2px solid #002D72;}
+.bc.minima{background:#E6F1FB;border:1px solid #006BC8;}
+.bc-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;}
+.bc-val{font-size:18px;font-weight:600;}
+.bc-sub{font-size:10px;color:#5A6A7E;margin-top:2px;}
+.cubierto-row{background:#F5F7FA;border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;font-size:12px;margin-top:8px;}
+.nav-tabs{display:flex;gap:8px;margin-bottom:1rem;}
+.nav-tab{flex:1;padding:8px;border:1px solid #D1D9E8;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-align:center;color:#5A6A7E;background:#fff;}
+.nav-tab.active{background:#002D72;color:#fff;border-color:#002D72;}
+.view{display:none;}
+.view.active{display:block;}
+.hist-card{background:#fff;border:1px solid #E4EAF4;border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.hist-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.hist-name{font-size:14px;font-weight:600;color:#002D72;}
+.hist-date{font-size:11px;color:#5A6A7E;}
+.hist-row{font-size:12px;color:#5A6A7E;margin-bottom:3px;}
+.hist-row strong{color:#1A1A2E;}
+.wa-wrap{background:#075E54;border-radius:12px;padding:14px;margin-top:1rem;}
+.wa-bub{background:#DCF8C6;border-radius:0 12px 12px 12px;padding:12px 14px;font-size:12px;color:#111;line-height:1.8;white-space:pre-wrap;word-break:break-word;}
+.wa-t{font-size:10px;color:rgba(255,255,255,0.6);text-align:right;margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════════════════════════════
+     PANTALLA 1 — METLIFE
+══════════════════════════════════════ -->
+<div class="pres-screen active" id="p1">
+  <div class="p1-logo">
+    <div class="p1-icon">ML</div>
+    <div class="p1-brand">
+      <div class="p1-brand-name">MetLife México</div>
+      <div class="p1-brand-sub">Agencia de Seguros</div>
+    </div>
+  </div>
+  <div class="p1-content">
+    <div class="p1-headline">Tu familia merece<br><span>estar protegida.</span></div>
+    <div class="p1-sub">Hoy vamos a hacer algo diferente. No vine a venderte un seguro. Vine a entender tu situación y ayudarte a ver si tienes algo sin cubrir.</div>
+    <div class="p1-facts">
+      <div class="p1-fact"><div class="p1-fact-num">150+</div><div class="p1-fact-label">Años protegiendo familias en el mundo</div></div>
+      <div class="p1-fact"><div class="p1-fact-num">No. 1</div><div class="p1-fact-label">Aseguradora de vida en México</div></div>
+      <div class="p1-fact"><div class="p1-fact-num">90M+</div><div class="p1-fact-label">Clientes en más de 40 países</div></div>
+      <div class="p1-fact"><div class="p1-fact-num">24/7</div><div class="p1-fact-label">Atención médica incluida en tu plan</div></div>
+    </div>
+  </div>
+  <div class="p1-footer">Tu tranquilidad es nuestro negocio desde 1868.</div>
+  <div class="pres-nav">
+    <div class="pres-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <button class="pres-btn white" onclick="goScreen(2)">Siguiente →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA 2 — ASESOR
+══════════════════════════════════════ -->
+<div class="pres-screen" id="p2">
+  <div class="p2-top">
+    <div class="p2-top-title">Tu asesor MetLife</div>
+    <div class="p2-top-name" id="p2-display-nombre">Cargando...</div>
+  </div>
+  <div class="p2-content" id="p2-content">
+
+    <!-- Modo visualización -->
+    <div id="p2-display">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+        <div class="p2-photo" id="p2-photo-display">
+          <span id="p2-photo-placeholder">📷<br><span style="font-size:10px;">Sin foto</span></span>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#1A1A2E;" id="p2-d-nombre">—</div>
+          <div style="font-size:13px;color:#5A6A7E;" id="p2-d-especialidad">—</div>
+        </div>
+      </div>
+      <div class="p2-info-display">
+        <div class="info-row"><div class="info-icon">🏆</div><div><div class="info-label">Experiencia</div><div class="info-val" id="p2-d-experiencia">—</div></div></div>
+        <div class="info-row"><div class="info-icon">📜</div><div><div class="info-label">Certificaciones</div><div class="info-val" id="p2-d-cert">—</div></div></div>
+        <div class="info-row"><div class="info-icon">📍</div><div><div class="info-label">Zona de atención</div><div class="info-val" id="p2-d-zona">—</div></div></div>
+        <div class="info-row"><div class="info-icon">📱</div><div><div class="info-label">Contacto</div><div class="info-val" id="p2-d-tel">—</div></div></div>
+        <div class="info-row"><div class="info-icon">✉️</div><div><div class="info-label">Correo</div><div class="info-val" id="p2-d-email">—</div></div></div>
+      </div>
+      <button class="p2-edit-btn" onclick="mostrarEdicion()">✏️ Editar mi perfil</button>
+    </div>
+
+    <!-- Modo edición -->
+    <div id="p2-edit" style="display:none;">
+      <div style="font-size:13px;font-weight:600;color:#002D72;margin-bottom:12px;">Completa tu perfil — se guarda automáticamente</div>
+      <div class="f full" style="margin-bottom:10px;">
+        <label>Foto de perfil</label>
+        <input type="file" id="p2-foto-input" accept="image/*" onchange="cargarFoto(this)">
+      </div>
+      <div class="g2">
+        <div class="f full"><label>Nombre completo</label><input type="text" id="p2-e-nombre" placeholder="Tu nombre completo"></div>
+        <div class="f full"><label>Especialidad</label><input type="text" id="p2-e-especialidad" placeholder="Ej: Especialista en protección financiera"></div>
+        <div class="f"><label>Años de experiencia</label><input type="text" id="p2-e-experiencia" placeholder="Ej: 8 años en MetLife"></div>
+        <div class="f"><label>Zona de atención</label><input type="text" id="p2-e-zona" placeholder="Ej: Torreón, Coahuila"></div>
+        <div class="f"><label>Certificaciones</label><input type="text" id="p2-e-cert" placeholder="Ej: AMIS, Agente Certificado MetLife"></div>
+        <div class="f"><label>Teléfono</label><input type="text" id="p2-e-tel" placeholder="+52 871 000 0000"></div>
+        <div class="f full"><label>Correo electrónico</label><input type="text" id="p2-e-email" placeholder="tucorreo@metlife.com"></div>
+      </div>
+      <button class="save-btn" onclick="guardarPerfil()">Guardar perfil</button>
+    </div>
+
+  </div>
+  <div class="pres-nav light">
+    <div class="pres-dots">
+      <div class="dot dark"></div>
+      <div class="dot dark active"></div>
+      <div class="dot dark"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="pres-btn outline" onclick="goScreen(1)">← Atrás</button>
+      <button class="pres-btn navy" onclick="goScreen(3)">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PANTALLA 3 — ÁREAS DE INTERÉS
+══════════════════════════════════════ -->
+<div class="pres-screen" id="p3">
+  <div class="p3-top">
+    <div class="p3-top-title">¿Qué situación te resuena más?</div>
+    <div class="p3-top-sub">Señala hasta 2 áreas que más te importen hoy</div>
+  </div>
+  <div class="p3-content">
+    <div class="p3-instruccion">Toca las que más te identifican. No hay respuestas correctas.</div>
+    <div class="sel-counter" id="sel-counter">Selecciona <strong>1 o 2</strong> áreas</div>
+    <div class="areas-grid">
+      <div class="area-card" id="a-proteccion" style="--ac:#002D72;--ab:#EEF3FF;" onclick="selArea('proteccion',this)">
+        <div class="area-icon">♥</div>
+        <div class="area-title">Protección familiar</div>
+        <div class="area-desc">Garantizar que tu familia mantenga su estilo de vida aunque tú ya no estés con ellos.</div>
+        <div class="area-badge" style="background:#EEF3FF;color:#002D72;">Protección y legado</div>
+      </div>
+      <div class="area-card" id="a-salud" style="--ac:#C0392B;--ab:#FCEBEB;" onclick="selArea('salud',this)">
+        <div class="area-icon">＋</div>
+        <div class="area-title">Salud y emergencias</div>
+        <div class="area-desc">En caso de enfermedad o accidente, atenderte en hospital privado sin preocuparte por la cuenta.</div>
+        <div class="area-badge" style="background:#FCEBEB;color:#C0392B;">Salud y emergencias</div>
+      </div>
+      <div class="area-card" id="a-hijos" style="--ac:#854F0B;--ab:#FAEEDA;" onclick="selArea('hijos',this)">
+        <div class="area-icon">✎</div>
+        <div class="area-title">Futuro de tus hijos</div>
+        <div class="area-desc">Crear el fondo para su carrera y dejarles capital para arrancar su vida independiente.</div>
+        <div class="area-badge" style="background:#FAEEDA;color:#854F0B;">Futuro de hijos</div>
+      </div>
+      <div class="area-card" id="a-retiro" style="--ac:#0F6E56;--ab:#EAF3DE;" onclick="selArea('retiro',this)">
+        <div class="area-icon">☀</div>
+        <div class="area-title">Retiro</div>
+        <div class="area-desc">Dejar de trabajar a los 60 o 65 años con un buen fondo, disfrutar esa etapa tranquilo.</div>
+        <div class="area-badge" style="background:#EAF3DE;color:#0F6E56;">Retiro y libertad</div>
+      </div>
+      <div class="area-card" id="a-meta" style="--ac:#00999B;--ab:#E1F5EE;" onclick="selArea('meta',this)">
+        <div class="area-icon">★</div>
+        <div class="area-title">Meta personal</div>
+        <div class="area-desc">Ahorro para comprar casa, viajar, emprender un negocio o lo que más quieras lograr.</div>
+        <div class="area-badge" style="background:#E1F5EE;color:#00999B;">Meta personal</div>
+      </div>
+      <div class="area-card" id="a-fondo" style="--ac:#534AB7;--ab:#EEEDFE;" onclick="selArea('fondo',this)">
+        <div class="area-icon">◎</div>
+        <div class="area-title">Fondo propio</div>
+        <div class="area-desc">Un ahorro a tu nombre que crezca con el tiempo. Tuyo, independiente de tu trabajo o de cualquier otra persona.</div>
+        <div class="area-badge" style="background:#EEEDFE;color:#534AB7;">Fondo propio</div>
+      </div>
+    </div>
+  </div>
+  <div class="pres-nav light">
+    <div class="pres-dots">
+      <div class="dot dark"></div>
+      <div class="dot dark"></div>
+      <div class="dot dark active"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="pres-btn outline" onclick="goScreen(2)">← Atrás</button>
+      <button class="pres-btn lime" onclick="iniciarSistema()">Iniciar diagnóstico →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SISTEMA DE PRIMERA CITA
+══════════════════════════════════════ -->
+<div class="sistema" id="sistema">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="bi">ML</div>
+    <div><div class="bn">Primera Cita · Sistema Metalife</div><div class="bs">Guía del asesor · Confidencial</div></div>
+  </div>
+  <div class="slbl" id="slbl-top">Sección 1 de 5</div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchView('cita',event)">Nueva cita</div>
+  <div class="nav-tab" onclick="switchView('historial',event)">Mis citas guardadas</div>
+</div>
+
+<div class="view active" id="view-cita">
+<div class="prog">
+  <div class="pi active" id="pi1" onclick="goTo(1)"><span class="pi-n">1</span>Apertura</div>
+  <div class="pi" id="pi2" onclick="goTo(2)"><span class="pi-n">2</span>Familia</div>
+  <div class="pi" id="pi3" onclick="goTo(3)"><span class="pi-n">3</span>Historial</div>
+  <div class="pi" id="pi4" onclick="goTo(4)"><span class="pi-n">4</span>Finanzas</div>
+  <div class="pi" id="pi5" onclick="goTo(5)"><span class="pi-n">5</span>Interés</div>
+</div>
+
+<!-- S1 -->
+<div class="sec active" id="sec1">
+  <div class="card">
+    <div class="st">Apertura</div><div class="ss">Primeros 5 minutos</div>
+    <div class="tip blue big"><strong>Di esto exactamente:</strong><br><br>"Lo que vamos a hacer hoy no es que yo te venda algo. Lo que vamos a hacer es que yo entienda tu situación financiera y al final de esta plática tú mismo vas a poder ver si tienes algo sin cubrir. Si lo tienes, vemos cómo lo resolvemos. Si no lo tienes, te lo digo yo mismo."</div>
+    <div class="sec-lbl">Datos básicos</div>
+    <div class="g2" style="margin-bottom:12px;">
+      <div class="f full"><label>Nombre del prospecto</label><input type="text" id="f-nombre" placeholder="Nombre completo"></div>
+      <div class="f"><label>Edad</label><input type="number" id="f-edad" placeholder="35" min="18" max="70"></div>
+      <div class="f"><label>Género</label><div class="rg" id="rg-gen"><div class="rb" onclick="pick('rg-gen',this,'Hombre')">Hombre</div><div class="rb" onclick="pick('rg-gen',this,'Mujer')">Mujer</div></div></div>
+      <div class="f"><label>¿Fumador?</label><div class="rg" id="rg-fuma"><div class="rb" onclick="pick('rg-fuma',this,'No')">No</div><div class="rb" onclick="pick('rg-fuma',this,'Sí','red')">Sí</div></div></div>
+    </div>
+    <div class="sec-lbl">Preguntas de apertura</div>
+    <div class="qb"><div class="qt">¿A qué te dedicas? ¿Tienes negocio propio o trabajas para alguien?</div><div class="rg" id="rg-trabajo" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-trabajo',this,'Empleado')">Empleado</div><div class="rb" onclick="pick('rg-trabajo',this,'Independiente')">Independiente</div><div class="rb" onclick="pick('rg-trabajo',this,'Empresario')">Empresario</div><div class="rb" onclick="pick('rg-trabajo',this,'Mixto')">Mixto</div></div><textarea id="f-ocupacion" placeholder="Detalles..."></textarea></div>
+    <div class="qb"><div class="qt">¿Cuántos años llevas en lo que haces y cómo llegaste a eso?</div><textarea id="f-trayectoria" placeholder="Respuesta del prospecto..."></textarea></div>
+    <div class="qb"><div class="qt">¿Ves tu trabajo o negocio creciendo en los próximos años?</div><div class="rg" id="rg-crecimiento" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-crecimiento',this,'Sí, creciendo','green')">Sí, creciendo</div><div class="rb" onclick="pick('rg-crecimiento',this,'Estable')">Estable</div><div class="rb" onclick="pick('rg-crecimiento',this,'Quiero cambiar','gold')">Quiero cambiar</div><div class="rb" onclick="pick('rg-crecimiento',this,'Con incertidumbre','red')">Con incertidumbre</div></div><textarea id="f-crecimiento-nota" placeholder="Detalles..."></textarea></div>
+    <div class="qb"><div class="qt">¿Alguien más genera ingresos o dependen principalmente de ti?</div><div class="rg" id="rg-proveedor" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-proveedor',this,'100% de mí','red')">100% de mí</div><div class="rb" onclick="pick('rg-proveedor',this,'Principalmente yo','gold')">Principalmente yo</div><div class="rb" onclick="pick('rg-proveedor',this,'Compartido')">Compartido</div><div class="rb" onclick="pick('rg-proveedor',this,'Independientes','green')">Independientes</div></div><textarea id="f-proveedor-nota" placeholder="Detalles..."></textarea></div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Señales a detectar</div>
+    <div class="sig"><div class="sd" style="background:#C0392B"></div>Si dependen 100% de él: máximo argumento.</div>
+    <div class="sig"><div class="sd" style="background:#F5A623"></div>Incertidumbre laboral: seguro propio cobra más valor.</div>
+    <div class="sig"><div class="sd" style="background:#97C123"></div>Si fuma: afecta la prima al cotizar.</div>
+    <div class="btn-row"><button class="btn navy" onclick="goTo(2)">Siguiente: Familia →</button></div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="sec" id="sec2">
+  <div class="card">
+    <div class="st">Perfil familiar</div><div class="ss">¿Quién depende de él?</div>
+    <div class="tip blue">Si tiene hijos pequeños y es el único proveedor, ese es el corazón de la presentación.</div>
+    <div class="g2" style="margin-bottom:10px;">
+      <div class="f full"><label>¿Tienes familia e hijos? ¿Qué edades tienen?</label><textarea id="f-familia-apertura" placeholder="Respuesta del prospecto..."></textarea></div>
+      <div class="f"><label>Estado civil</label><div class="rg" id="rg-ec"><div class="rb" onclick="pick('rg-ec',this,'Soltero')">Soltero</div><div class="rb" onclick="pick('rg-ec',this,'Casado')">Casado</div><div class="rb" onclick="pick('rg-ec',this,'Unión libre')">Unión libre</div><div class="rb" onclick="pick('rg-ec',this,'Divorciado')">Divorciado</div></div></div>
+      <div class="f"><label>¿Pareja genera ingresos?</label><div class="rg" id="rg-pareja"><div class="rb" onclick="pick('rg-pareja',this,'Sí')">Sí</div><div class="rb" onclick="pick('rg-pareja',this,'No')">No</div><div class="rb" onclick="pick('rg-pareja',this,'Sin pareja')">Sin pareja</div></div></div>
+      <div class="f"><label>Número de hijos</label><input type="number" id="f-hijos" placeholder="2" min="0" oninput="calcDep()"></div>
+      <div class="f"><label>Edades de los hijos</label><input type="text" id="f-edades" placeholder="5, 8, 12" oninput="calcDep()"></div>
+      <div class="f"><label>Años hasta independencia <span class="auto-b">Auto</span></label><input type="text" id="f-anios-dep" readonly placeholder="Se calcula automático"></div>
+      <div class="f"><label>¿Otros dependientes?</label><input type="text" id="f-otros-dep" placeholder="Papás, hermanos..."></div>
+    </div>
+    <div class="qb"><div class="qt">¿Es importante para ti que tus hijos tengan educación privada de calidad?</div><div class="rg" id="rg-edu" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-edu',this,'Sí, es prioridad','green')">Sí, es prioridad</div><div class="rb" onclick="pick('rg-edu',this,'Sí, si se puede')">Sí, si se puede</div><div class="rb" onclick="pick('rg-edu',this,'No es necesario')">No es necesario</div><div class="rb" onclick="pick('rg-edu',this,'No aplica')">No aplica</div></div><textarea id="f-edu-nota" placeholder="Detalles..."></textarea></div>
+    <div class="f full"><label>Notas adicionales</label><textarea id="f-notas-fam" placeholder="Lo que dijo con sus propias palabras..."></textarea></div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Señales</div>
+    <div class="sig"><div class="sd" style="background:#C0392B"></div>Proveedor único con hijos menores de 10 años: máxima urgencia.</div>
+    <div class="sig"><div class="sd" style="background:#0F6E56"></div>Mujer con hijos dependientes: mismo argumento, misma urgencia.</div>
+    <div class="btn-row"><button class="btn" onclick="goTo(1)">← Regresar</button><button class="btn navy" onclick="goTo(3)">Siguiente: Historial →</button></div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="sec" id="sec3">
+  <div class="card">
+    <div class="st">Historial de salud</div><div class="ss">La sección más importante · 8 minutos</div>
+    <div class="tip red">Cuando mencione un caso familiar, <strong>para y pregunta: "¿Me puedes contar qué pasó?"</strong> Luego: <strong>"¿Y cómo les fue económicamente?"</strong></div>
+    <div class="qb"><div class="qt">1. ¿Actualmente cómo te encuentras de salud?</div><div class="rg" id="rg-salud" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-salud',this,'Excelente','green')">Excelente</div><div class="rb" onclick="pick('rg-salud',this,'Buena','green')">Buena</div><div class="rb" onclick="pick('rg-salud',this,'Regular','gold')">Regular</div><div class="rb" onclick="pick('rg-salud',this,'Con padecimiento','red')">Con padecimiento</div></div><textarea id="f-salud-nota" placeholder="Detalles..."></textarea></div>
+    <div class="qb"><div class="qt">2. ¿Has estado hospitalizado o te han detectado alguna enfermedad crónica?</div><div class="rg" id="rg-hosp" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-hosp',this,'No','green')">No</div><div class="rb" onclick="pick('rg-hosp',this,'Hospitalizado','gold')">Sí, hospitalizado</div><div class="rb" onclick="pick('rg-hosp',this,'Enf. crónica','red')">Sí, enf. crónica</div><div class="rb" onclick="pick('rg-hosp',this,'Ambos','red')">Ambos</div></div><textarea id="f-hosp-nota" placeholder="Detalles..."></textarea></div>
+    <div class="qb"><div class="qt">3. ¿Algún familiar ha tenido cáncer, diabetes, infarto u otra enfermedad grave?</div><div class="rg" id="rg-hist" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-hist',this,'No','green')">No</div><div class="rb" onclick="pick('rg-hist',this,'Sí','red');showHD(true)">Sí</div><div class="rb" onclick="pick('rg-hist',this,'No sabe');showHD(false)">No sabe</div></div><div id="hd" style="display:none;margin-bottom:8px;"><div class="rg" id="rg-pad" style="margin-bottom:6px;"><div class="rb" onclick="pick('rg-pad',this,'Cáncer')">Cáncer</div><div class="rb" onclick="pick('rg-pad',this,'Diabetes')">Diabetes</div><div class="rb" onclick="pick('rg-pad',this,'Infarto')">Infarto</div><div class="rb" onclick="pick('rg-pad',this,'Embolia')">Embolia</div><div class="rb" onclick="pick('rg-pad',this,'Varios')">Varios</div></div><div class="rg" id="rg-quien" style="margin-bottom:8px;"><div class="rb" onclick="pick('rg-quien',this,'Papá')">Papá</div><div class="rb" onclick="pick('rg-quien',this,'Mamá')">Mamá</div><div class="rb" onclick="pick('rg-quien',this,'Hermano/a')">Hermano/a</div><div class="rb" onclick="pick('rg-quien',this,'Abuelos')">Abuelos</div><div class="rb" onclick="pick('rg-quien',this,'Varios')">Varios</div></div><textarea id="f-hist-que" placeholder="¿Qué pasó? Captura textual..."></textarea></div></div>
+    <div class="qb"><div class="qt">4. Si algo así te pasara a ti, ¿cómo estaría tu familia económicamente?</div><div class="tip gold" style="margin-bottom:8px;font-size:11px;">Si no hay historial: "¿Qué pasaría si mañana te diagnosticaran algo grave?"</div><textarea id="f-economico" placeholder="Anota textualmente lo que dijo..."></textarea></div>
+    <div class="qb"><div class="qt">5a. Si no pudieras trabajar por enfermedad o accidente, ¿quién sostendría a tu familia?</div><textarea id="f-invalidez" placeholder="Respuesta..."></textarea></div>
+    <div class="qb"><div class="qt">5b. Si faltaras, ¿tienen con qué seguir viviendo igual los próximos años?</div><textarea id="f-fallecimiento" placeholder="Respuesta..."></textarea></div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Señales críticas</div>
+    <div class="sig"><div class="sd" style="background:#C0392B"></div>"Gastaron todo" o "quedaron endeudados": anótalo. Es la apertura de la segunda cita.</div>
+    <div class="sig"><div class="sd" style="background:#006BC8"></div>Mujer con historial de cáncer femenino: la indemnización en vida de Metalife cubre exactamente eso.</div>
+    <div class="btn-row"><button class="btn" onclick="goTo(2)">← Regresar</button><button class="btn navy" onclick="goTo(4)">Siguiente: Finanzas →</button></div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="sec" id="sec4">
+  <div class="card">
+    <div class="st">Situación financiera y metas</div><div class="ss">Sin juzgar. Solo entender el punto de partida.</div>
+    <div class="tip blue">Si tiene seguro del trabajo: "¿Sabes qué pasa si cambias de trabajo?" Deja que él llegue a la conclusión.</div>
+    <div class="sec-lbl">Situación financiera</div>
+    <div class="g2" style="margin-bottom:10px;">
+      <div class="f"><label>Ingreso mensual ($)</label><input type="number" id="f-ingreso" placeholder="25000" min="0" oninput="calcDiag()"></div>
+      <div class="f"><label>Gastos mensuales ($)</label><input type="number" id="f-gastos" placeholder="18000" min="0" oninput="calcDiag()"></div>
+      <div class="f"><label>Ahorros o inversiones ($)</label><input type="number" id="f-ahorros" placeholder="50000" min="0" oninput="calcDiag()"></div>
+      <div class="f"><label>¿Deudas activas?</label><div class="rg" id="rg-deudas"><div class="rb" onclick="pick('rg-deudas',this,'No')">No</div><div class="rb" onclick="pick('rg-deudas',this,'Hipoteca')">Hipoteca</div><div class="rb" onclick="pick('rg-deudas',this,'Auto')">Auto</div><div class="rb" onclick="pick('rg-deudas',this,'Tarjetas')">Tarjetas</div><div class="rb" onclick="pick('rg-deudas',this,'Varias')">Varias</div></div></div>
+      <div class="f"><label>¿Seguro del trabajo?</label><div class="rg" id="rg-seg-trabajo" style="margin-bottom:6px;"><div class="rb" onclick="pick('rg-seg-trabajo',this,'No');toggleST(false)">No</div><div class="rb" onclick="pick('rg-seg-trabajo',this,'Sí','green');toggleST(true)">Sí</div></div><div id="st-campo" style="display:none;"><input type="number" id="f-sa-trabajo" placeholder="Suma asegurada ($)" min="0" oninput="calcDiag()"></div></div>
+      <div class="f"><label>¿Seguro propio?</label><div class="rg" id="rg-seg-propio" style="margin-bottom:6px;"><div class="rb" onclick="pick('rg-seg-propio',this,'No');toggleSP(false)">No</div><div class="rb" onclick="pick('rg-seg-propio',this,'Sí','green');toggleSP(true)">Sí</div></div><div id="sp-campo" style="display:none;"><input type="number" id="f-sa-propio" placeholder="Suma asegurada ($)" min="0" oninput="calcDiag()"></div></div>
+      <div class="f"><label>¿AFORE activo?</label><div class="rg" id="rg-afore"><div class="rb" onclick="pick('rg-afore',this,'Sí','green')">Sí</div><div class="rb" onclick="pick('rg-afore',this,'No','red')">No</div><div class="rb" onclick="pick('rg-afore',this,'No sabe')">No sabe</div></div></div>
+      <div class="f"><label>¿Gastos médicos?</label><div class="rg" id="rg-gmm"><div class="rb" onclick="pick('rg-gmm',this,'Sí','green')">Sí</div><div class="rb" onclick="pick('rg-gmm',this,'No','red')">No</div><div class="rb" onclick="pick('rg-gmm',this,'Del trabajo','gold')">Del trabajo</div></div></div>
+      <div class="f"><label>¿Plan de retiro PPR?</label><div class="rg" id="rg-ppr"><div class="rb" onclick="pick('rg-ppr',this,'Sí','green')">Sí</div><div class="rb" onclick="pick('rg-ppr',this,'No','red')">No</div></div></div>
+    </div>
+    <div id="diag-wrap" style="display:none;">
+      <div class="sec-lbl">Diagnóstico · Suma asegurada</div>
+      <div class="diag-wrap">
+        <div class="diag-hdr">Análisis de protección · <span id="d-nombre-h">—</span></div>
+        <div class="diag-body">
+          <div class="diag-row"><span class="diag-key">Gastos mensuales</span><span class="diag-val" id="d-gastos">—</span></div>
+          <div class="diag-row"><span class="diag-key">S.A. ideal (10 años de gastos)</span><span class="diag-val" id="d-ideal" style="color:#002D72;">—</span></div>
+          <div class="diag-row"><span class="diag-key">S.A. mínima (5 años de gastos)</span><span class="diag-val" id="d-minima" style="color:#006BC8;">—</span></div>
+          <div style="height:1px;background:#E4EAF4;margin:4px 0;"></div>
+          <div class="diag-row"><span class="diag-key">Seguro del trabajo</span><span class="diag-val" id="d-st" style="color:#0F6E56;">—</span></div>
+          <div class="diag-row"><span class="diag-key">Seguro propio</span><span class="diag-val" id="d-sp" style="color:#0F6E56;">—</span></div>
+          <div class="diag-row"><span class="diag-key">Ahorros e inversiones</span><span class="diag-val" id="d-ah" style="color:#0F6E56;">—</span></div>
+          <div class="cubierto-row"><span style="font-weight:600;">Total cubierto hoy</span><span style="font-weight:600;color:#0F6E56;" id="d-cubierto">—</span></div>
+          <div class="brecha-grid">
+            <div class="bc ideal"><div class="bc-lbl" style="color:#002D72;">Brecha ideal</div><div class="bc-val" id="d-bi" style="color:#002D72;">—</div><div class="bc-sub">Lo que Metalife puede cubrir</div></div>
+            <div class="bc minima"><div class="bc-lbl" style="color:#006BC8;">Brecha mínima</div><div class="bc-val" id="d-bm" style="color:#006BC8;">—</div><div class="bc-sub">Protección básica necesaria</div></div>
+          </div>
+          <div id="d-nota-st" style="margin-top:8px;font-size:11px;color:#5A6A7E;font-style:italic;text-align:center;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Metas</div>
+    <div class="mb"><div class="mh"><div class="md" style="background:#006BC8"></div>Corto plazo · 1 a 5 años</div><div class="chips" id="cg-corto"><div class="chip" onclick="toggleChip(this)">Fondo de emergencia</div><div class="chip" onclick="toggleChip(this)">Comprar auto</div><div class="chip" onclick="toggleChip(this)">Viaje o experiencia</div><div class="chip" onclick="toggleChip(this)">Pagar deudas</div><div class="chip" onclick="toggleChip(this)">Capital para negocio</div><div class="chip" onclick="toggleChip(this)">Remodelación</div></div><textarea id="f-meta-corto" placeholder="Notas: lo que dijo con sus palabras..."></textarea></div>
+    <div class="mb"><div class="mh"><div class="md" style="background:#0F6E56"></div>Mediano plazo · 5 a 10 años</div><div class="chips" id="cg-medio"><div class="chip" onclick="toggleChip(this)">Comprar casa</div><div class="chip" onclick="toggleChip(this)">Universidad de hijos</div><div class="chip" onclick="toggleChip(this)">Crecer el negocio</div><div class="chip" onclick="toggleChip(this)">Inversión inmobiliaria</div><div class="chip" onclick="toggleChip(this)">Cambio de carrera</div><div class="chip" onclick="toggleChip(this)">Independencia financiera</div></div><textarea id="f-meta-medio" placeholder="Notas..."></textarea></div>
+    <div class="mb"><div class="mh"><div class="md" style="background:#854F0B"></div>Largo plazo · Más de 10 años</div><div class="chips" id="cg-largo"><div class="chip" onclick="toggleChip(this)">Retiro cómodo</div><div class="chip" onclick="toggleChip(this)">Dejar herencia</div><div class="chip" onclick="toggleChip(this)">Fondo universitario hijos</div><div class="chip" onclick="toggleChip(this)">Patrimonio familiar</div><div class="chip" onclick="toggleChip(this)">Vivir de inversiones</div><div class="chip" onclick="toggleChip(this)">No depender de nadie</div></div><textarea id="f-meta-largo" placeholder="Notas..."></textarea></div>
+    <div class="btn-row"><button class="btn" onclick="goTo(3)">← Regresar</button><button class="btn navy" onclick="goTo(5)">Siguiente: Interés →</button></div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="sec" id="sec5">
+  <div class="card">
+    <div class="st">Interés principal</div><div class="ss">Cierre de primera cita · Últimos 10 minutos</div>
+    <div class="tip blue">Las áreas que seleccionó en la presentación ya están marcadas. Confirma con el cliente y deja que ajuste si quiere.</div>
+    <div class="sec-lbl">Interés del cliente (máx. 2)</div>
+    <div class="g2" id="area-grid-s5" style="margin-bottom:12px;">
+      <div class="ac" id="ac-proteccion" onclick="toggleArea('proteccion',this,'#002D72','#EEF3FF')"><div class="ai">♥</div><div class="aq">Protección familiar</div><div class="ah">Garantizar el estilo de vida de tu familia si ya no estás.</div><div class="al" style="color:#002D72;">Protección y legado</div></div>
+      <div class="ac" id="ac-salud" onclick="toggleArea('salud',this,'#C0392B','#FCEBEB')"><div class="ai">＋</div><div class="aq">Salud y emergencias</div><div class="ah">Hospital privado sin preocuparte por la cuenta.</div><div class="al" style="color:#C0392B;">Salud</div></div>
+      <div class="ac" id="ac-hijos" onclick="toggleArea('hijos',this,'#854F0B','#FAEEDA')"><div class="ai">✎</div><div class="aq">Futuro de tus hijos</div><div class="ah">Fondo para carrera y capital para arrancar su vida.</div><div class="al" style="color:#854F0B;">Hijos</div></div>
+      <div class="ac" id="ac-retiro" onclick="toggleArea('retiro',this,'#0F6E56','#EAF3DE')"><div class="ai">☀</div><div class="aq">Retiro</div><div class="ah">Dejar de trabajar a los 60-65 con fondo sólido.</div><div class="al" style="color:#0F6E56;">Retiro</div></div>
+      <div class="ac" id="ac-meta" onclick="toggleArea('meta',this,'#00999B','#E1F5EE')"><div class="ai">★</div><div class="aq">Meta personal</div><div class="ah">Casa, viaje, negocio o lo que más quieras lograr.</div><div class="al" style="color:#00999B;">Meta</div></div>
+      <div class="ac" id="ac-fondo" onclick="toggleArea('fondo',this,'#534AB7','#EEEDFE')"><div class="ai">◎</div><div class="aq">Fondo propio</div><div class="ah">Ahorro a tu nombre, independiente de todo.</div><div class="al" style="color:#534AB7;">Fondo</div></div>
+    </div>
+    <div class="f full" style="margin-bottom:12px;"><label>¿Por qué le importa? (textual)</label><textarea id="f-por-que" placeholder='"Dijo que su mayor preocupación es..."'></textarea></div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Presupuesto</div>
+    <div class="pres-block">
+      <div class="pres-title">Aportación base anual</div>
+      <div class="pres-sub">"¿Cuánto podrías apartar al año de forma cómoda y constante? No tiene que ser exacto, dame uno para arrancar."</div>
+      <div class="g2"><div class="f"><label>Presupuesto anual ($)</label><input type="number" id="f-presupuesto" placeholder="18000" min="0"></div><div class="f"><label>Forma de pago</label><div class="rg" id="rg-pago"><div class="rb" onclick="pick('rg-pago',this,'Anual')">Anual</div><div class="rb" onclick="pick('rg-pago',this,'Semestral')">Semestral</div><div class="rb" onclick="pick('rg-pago',this,'Mensual')">Mensual</div></div></div></div>
+    </div>
+    <div class="pres-block">
+      <div class="pres-title">Aportación adicional</div>
+      <div class="pres-sub">"En meses buenos, con aguinaldo o ingreso extra, ¿algo adicional sin comprometerte?"</div>
+      <div class="g2"><div class="f"><label>Monto adicional ($)</label><input type="number" id="f-adicional" placeholder="5000" min="0"></div><div class="f"><label>¿Cuándo?</label><div class="rg" id="rg-momento"><div class="rb" onclick="pick('rg-momento',this,'Aguinaldo')">Aguinaldo</div><div class="rb" onclick="pick('rg-momento',this,'Meses buenos')">Meses buenos</div><div class="rb" onclick="pick('rg-momento',this,'Utilidades')">Utilidades</div><div class="rb" onclick="pick('rg-momento',this,'Bono')">Bono</div></div></div><div class="f full"><label>Notas sobre aportación adicional</label><textarea id="f-adicional-nota" placeholder="Lo que dijo..."></textarea></div></div>
+    </div>
+    <div class="g2" style="margin-bottom:10px;">
+      <div class="f full"><label>Segunda cita agendada</label><input type="text" id="f-segunda-cita" placeholder="Martes 17 de junio, 11:00 am"></div>
+      <div class="f full"><label>Teléfono del asesor</label><input type="text" id="f-tel" placeholder="+52 871 000 0000"></div>
+      <div class="f full"><label>Observaciones finales</label><textarea id="f-obs" placeholder="Nivel de interés, objeciones, referencias..."></textarea></div>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-lbl">Señales</div>
+    <div class="sig"><div class="sd" style="background:#0F6E56"></div>Si da número alto: no reacciones, solo anota.</div>
+    <div class="sig"><div class="sd" style="background:#F5A623"></div>Si da número bajo: "Perfecto, con eso trabajo."</div>
+    <div class="sig"><div class="sd" style="background:#C0392B"></div>Si no quiere agendar: algo no quedó claro. Pregunta antes de salir.</div>
+    <div class="btn-row">
+      <button class="btn" onclick="goTo(4)">← Regresar</button>
+      <button class="btn lime" onclick="generarWA()">Generar WhatsApp ↗</button>
+      <button class="btn navy" onclick="guardarCita()">Guardar cita</button>
+    </div>
+    <div id="wa-output" style="display:none;margin-top:1rem;">
+      <div class="divider"></div>
+      <div class="sec-lbl">Vista previa WhatsApp</div>
+      <div class="wa-wrap"><div class="wa-bub" id="wa-text"></div><div class="wa-t">Ahora · ✓✓</div></div>
+      <div class="btn-row"><button class="btn navy" id="btn-copiar" onclick="copiarWA()">Copiar mensaje</button><button class="btn" onclick="nuevoCliente()">+ Nueva cita</button></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- fin view-cita -->
+
+<div class="view" id="view-historial">
+  <div class="card">
+    <div class="st">Mis citas guardadas</div><div class="ss">Registro de todas tus primeras citas</div>
+    <div id="hist-empty" style="text-align:center;padding:2rem;color:#5A6A7E;font-size:13px;">No tienes citas guardadas aún.<br>Completa una primera cita y presiona "Guardar cita".</div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+</div><!-- fin sistema -->
+</div><!-- fin app -->
+
+<script>
+const g = id => document.getElementById(id);
+const fmt = n => (n&&!isNaN(n)&&Number(n)>0)?'$'+Math.round(Number(n)).toLocaleString('es-MX'):'$0';
+const fmtN = n => isNaN(n)||!n?0:Math.round(Number(n));
+let D = {};
+let areasOk = [];
+let areasP3 = [];
+let citas = JSON.parse(localStorage.getItem('ml_citas')||'[]');
+let currentScreen = 1;
+
+// ── PERFIL DEL ASESOR ──
+function cargarPerfilGuardado(){
+  const p = JSON.parse(localStorage.getItem('ml_perfil')||'{}');
+  if(p.nombre){
+    g('p2-display-nombre').textContent = p.nombre;
+    g('p2-d-nombre').textContent = p.nombre;
+    g('p2-d-especialidad').textContent = p.especialidad||'—';
+    g('p2-d-experiencia').textContent = p.experiencia||'—';
+    g('p2-d-cert').textContent = p.cert||'—';
+    g('p2-d-zona').textContent = p.zona||'—';
+    g('p2-d-tel').textContent = p.tel||'—';
+    g('p2-d-email').textContent = p.email||'—';
+    g('p2-e-nombre').value = p.nombre||'';
+    g('p2-e-especialidad').value = p.especialidad||'';
+    g('p2-e-experiencia').value = p.experiencia||'';
+    g('p2-e-cert').value = p.cert||'';
+    g('p2-e-zona').value = p.zona||'';
+    g('p2-e-tel').value = p.tel||'';
+    g('p2-e-email').value = p.email||'';
+    if(p.foto){
+      const img = document.createElement('img');
+      img.src = p.foto;
+      const ph = g('p2-photo-display');
+      ph.innerHTML='';
+      ph.appendChild(img);
+    }
+  } else {
+    g('p2-display-nombre').textContent = 'Configura tu perfil';
+    mostrarEdicion();
+  }
+}
+
+function mostrarEdicion(){
+  g('p2-display').style.display='none';
+  g('p2-edit').style.display='block';
+}
+
+function guardarPerfil(){
+  const p = {
+    nombre: g('p2-e-nombre').value.trim(),
+    especialidad: g('p2-e-especialidad').value.trim(),
+    experiencia: g('p2-e-experiencia').value.trim(),
+    cert: g('p2-e-cert').value.trim(),
+    zona: g('p2-e-zona').value.trim(),
+    tel: g('p2-e-tel').value.trim(),
+    email: g('p2-e-email').value.trim(),
+    foto: localStorage.getItem('ml_foto')||''
+  };
+  localStorage.setItem('ml_perfil', JSON.stringify(p));
+  cargarPerfilGuardado();
+  g('p2-display').style.display='block';
+  g('p2-edit').style.display='none';
+}
+
+function cargarFoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    localStorage.setItem('ml_foto', e.target.result);
+    const img = document.createElement('img');
+    img.src = e.target.result;
+    const ph = g('p2-photo-display');
+    ph.innerHTML=''; ph.appendChild(img);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── NAVEGACIÓN PRESENTACIÓN ──
+function goScreen(n){
+  document.querySelectorAll('.pres-screen').forEach(s=>s.classList.remove('active'));
+  const scr = g('p'+n);
+  if(scr) scr.classList.add('active');
+  currentScreen = n;
+  window.scrollTo(0,0);
+}
+
+function selArea(key, el){
+  const idx = areasP3.indexOf(key);
+  if(idx>-1){
+    areasP3.splice(idx,1);
+    el.classList.remove('selected');
+  } else {
+    if(areasP3.length>=2) return;
+    areasP3.push(key);
+    el.classList.add('selected');
+  }
+  const counter = g('sel-counter');
+  if(areasP3.length===0) counter.innerHTML='Selecciona <strong>1 o 2</strong> áreas';
+  else if(areasP3.length===1) counter.innerHTML='<strong>1</strong> área seleccionada · Puedes elegir una más';
+  else counter.innerHTML='<strong>2</strong> áreas seleccionadas';
+}
+
+function iniciarSistema(){
+  // Pre-marcar las áreas seleccionadas en p3 dentro del sistema
+  areasOk = areasP3.slice();
+  D.areas = areasOk.slice();
+  areasOk.forEach(key => {
+    const el = g('ac-'+key);
+    if(el){
+      const colors = {
+        proteccion:['#002D72','#EEF3FF'],salud:['#C0392B','#FCEBEB'],
+        hijos:['#854F0B','#FAEEDA'],retiro:['#0F6E56','#EAF3DE'],
+        meta:['#00999B','#E1F5EE'],fondo:['#534AB7','#EEEDFE']
+      };
+      el.classList.add('on');
+      if(colors[key]){ el.style.borderColor=colors[key][0]; el.style.background=colors[key][1]; }
+    }
+  });
+  document.querySelectorAll('.pres-screen').forEach(s=>s.classList.remove('active'));
+  g('sistema').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── SISTEMA ──
+function switchView(v, evt){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  g('view-'+v).classList.add('active');
+  if(evt) evt.target.classList.add('active');
+  if(v==='historial') renderHistorial();
+}
+
+function goTo(n){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  g('sec'+n).classList.add('active');
+  for(let i=1;i<=5;i++){const el=g('pi'+i);el.className='pi'+(i<n?' done':i===n?' active':'');}
+  g('slbl-top').textContent='Sección '+n+' de 5';
+  window.scrollTo(0,0);
+}
+
+function pick(gid,el,val,colorClass){
+  document.querySelectorAll('#'+gid+' .rb').forEach(b=>{b.classList.remove('on','red','green','gold');});
+  el.classList.add('on');
+  if(colorClass)el.classList.add(colorClass);
+  D[gid]=val;
+}
+
+function toggleChip(el){el.classList.toggle('on');}
+function getChips(gid){return[...document.querySelectorAll('#'+gid+' .chip.on')].map(c=>c.textContent).join(', ');}
+function showHD(show){g('hd').style.display=show?'block':'none';}
+function toggleST(show){g('st-campo').style.display=show?'block':'none';if(!show){g('f-sa-trabajo').value='';calcDiag();}}
+function toggleSP(show){g('sp-campo').style.display=show?'block':'none';if(!show){g('f-sa-propio').value='';calcDiag();}}
+
+function calcDep(){
+  const str=g('f-edades').value;
+  if(!str.trim()){g('f-anios-dep').value='';return;}
+  const eds=str.split(',').map(e=>parseInt(e.trim())).filter(e=>!isNaN(e));
+  if(!eds.length){g('f-anios-dep').value='';return;}
+  const menor=Math.min(...eds);
+  const anios=Math.max(0,23-menor);
+  g('f-anios-dep').value=anios>0?anios+' años (hijo menor: '+menor+' años)':'Ya independientes';
+  D.aniosDep=anios;
+}
+
+function calcDiag(){
+  const gastos=fmtN(g('f-gastos').value);
+  const ahorros=fmtN(g('f-ahorros').value);
+  const saTrabajo=fmtN(g('f-sa-trabajo')?g('f-sa-trabajo').value:0);
+  const saPropio=fmtN(g('f-sa-propio')?g('f-sa-propio').value:0);
+  if(!gastos){g('diag-wrap').style.display='none';return;}
+  const ideal=gastos*12*10;
+  const minima=gastos*12*5;
+  const cubierto=saTrabajo+saPropio+ahorros;
+  const bIdeal=Math.max(0,ideal-cubierto);
+  const bMinima=Math.max(0,minima-cubierto);
+  D.gastos=gastos;D.ideal=ideal;D.minima=minima;D.cubierto=cubierto;D.bIdeal=bIdeal;D.bMinima=bMinima;D.saTrabajo=saTrabajo;D.ahorros=ahorros;
+  const nombre=g('f-nombre').value.trim()||'Prospecto';
+  g('d-nombre-h').textContent=nombre;
+  g('d-gastos').textContent=fmt(gastos)+'/mes';
+  g('d-ideal').textContent=fmt(ideal);
+  g('d-minima').textContent=fmt(minima);
+  g('d-st').textContent=saTrabajo>0?fmt(saTrabajo):'No tiene';
+  g('d-sp').textContent=fmtN(g('f-sa-propio')?g('f-sa-propio').value:0)>0?fmt(fmtN(g('f-sa-propio').value)):'No tiene';
+  g('d-ah').textContent=fmt(ahorros);
+  g('d-cubierto').textContent=fmt(cubierto);
+  g('d-bi').textContent=fmt(bIdeal);
+  g('d-bm').textContent=fmt(bMinima);
+  g('d-bi').style.color=bIdeal>1000000?'#C0392B':bIdeal>500000?'#F5A623':'#0F6E56';
+  g('d-nota-st').textContent=saTrabajo>0?'* Seguro del trabajo incluido. En la 2ª cita recuerda que depende del empleo.':'';
+  g('diag-wrap').style.display='block';
+}
+
+function toggleArea(key,el,color,bg){
+  const idx=areasOk.indexOf(key);
+  if(idx>-1){areasOk.splice(idx,1);el.classList.remove('on');el.style.borderColor='';el.style.background='';}
+  else{if(areasOk.length>=2)return;areasOk.push(key);el.classList.add('on');el.style.borderColor=color;el.style.background=bg;}
+  D.areas=areasOk.slice();
+}
+
+function generarWA(){
+  const perfil = JSON.parse(localStorage.getItem('ml_perfil')||'{}');
+  const nombre=g('f-nombre').value.trim()||'el prospecto';
+  const edad=g('f-edad').value||'—';
+  const asesor=perfil.nombre||g('f-tel').value.trim()||'[Asesor]';
+  const tel=perfil.tel||g('f-tel').value.trim()||'[Teléfono]';
+  const trabajo=D['rg-trabajo']||'—';
+  const fuma=D['rg-fuma']||'No';
+  const ec=D['rg-ec']||'—';
+  const hijos=g('f-hijos').value||'0';
+  const aniosDep=g('f-anios-dep').value||'—';
+  const proveedor=D['rg-proveedor']||'—';
+  const salud=D['rg-salud']||'—';
+  const historial=D['rg-hist']||'—';
+  const presupuesto=g('f-presupuesto').value;
+  const adicional=g('f-adicional').value;
+  const momento=D['rg-momento']||'';
+  const pago=D['rg-pago']||'Anual';
+  const segundaCita=g('f-segunda-cita').value.trim();
+  const porQue=g('f-por-que').value.trim();
+  const chipsCorto=getChips('cg-corto');
+  const chipsMedio=getChips('cg-medio');
+  const chipsLargo=getChips('cg-largo');
+  const notaCorto=g('f-meta-corto').value.trim();
+  const notaMedio=g('f-meta-medio').value.trim();
+  const notaLargo=g('f-meta-largo').value.trim();
+  const areaTextos={proteccion:'♥ Protección familiar',salud:'＋ Salud y emergencias',hijos:'✎ Futuro de hijos',retiro:'☀ Retiro',meta:'★ Meta personal',fondo:'◎ Fondo propio'};
+  const metas=(D.areas||[]).map(a=>areaTextos[a]).join(' + ')||'—';
+  let metasSection='';
+  if(chipsCorto||notaCorto){metasSection+=`\n📌 *Corto plazo (1-5 años)*`;if(chipsCorto)metasSection+=`\n${chipsCorto}`;if(notaCorto)metasSection+=`\n_"${notaCorto}"_`;}
+  if(chipsMedio||notaMedio){metasSection+=`\n\n📌 *Mediano plazo (5-10 años)*`;if(chipsMedio)metasSection+=`\n${chipsMedio}`;if(notaMedio)metasSection+=`\n_"${notaMedio}"_`;}
+  if(chipsLargo||notaLargo){metasSection+=`\n\n📌 *Largo plazo (+10 años)*`;if(chipsLargo)metasSection+=`\n${chipsLargo}`;if(notaLargo)metasSection+=`\n_"${notaLargo}"_`;}
+  let diagSection='';
+  if(D.gastos){diagSection=`\n\n💡 *Diagnóstico de protección*\n• S.A. ideal (10 años): *${fmt(D.ideal)}*\n• S.A. mínima (5 años): *${fmt(D.minima)}*\n• Total cubierto hoy: ${fmt(D.cubierto)}\n• Brecha ideal: *${fmt(D.bIdeal)}*\n• Brecha mínima: *${fmt(D.bMinima)}*`;if(D.saTrabajo>0)diagSection+=`\n_(Incluye seguro del trabajo — recuerda que depende del empleo)_`;}
+  const wa=`Hola ${nombre} 👋\n\nFue un placer platicar contigo hoy. Te comparto el resumen de nuestra conversación:\n\n👤 *Tu perfil*\n• ${edad} años · ${trabajo}${fuma==='Sí'?' · Fumador':''}\n• Estado civil: ${ec} · Hijos: ${hijos}\n• Dependientes aprox. ${aniosDep}\n• Sostén económico: ${proveedor}\n• Salud actual: ${salud}\n• Historial familiar: ${historial}${diagSection}\n\n🎯 *Lo que más te interesa lograr*\n*${metas}*${porQue?'\n\n"'+porQue+'"':''}${metasSection}\n\n📋 *Lo que voy a prepararte*\nUn Proyecto Financiero personalizado con 3 opciones:\n• Aportación base: *${fmt(presupuesto)}/${pago.toLowerCase()}*${adicional&&Number(adicional)>0?'\n• Aportación adicional: '+fmt(adicional)+' ('+momento+')':''}\n\n📅 *Tu próxima cita*\n${segundaCita||'Por confirmar — te escribo para coordinar'}\n\nCualquier duda estoy a tus órdenes. ¡Hasta pronto! 🙌\n\n_MetLife · ${asesor}_\n_${tel}_`;
+  g('wa-text').textContent=wa;
+  g('wa-output').style.display='block';
+  window._wa=wa;
+  setTimeout(()=>window.scrollTo(0,99999),100);
+}
+
+function copiarWA(){
+  if(navigator.clipboard&&window._wa){navigator.clipboard.writeText(window._wa).then(()=>{const b=g('btn-copiar');b.textContent='¡Copiado ✓';setTimeout(()=>{b.textContent='Copiar mensaje';},2000);});}
+}
+
+function guardarCita(){
+  const nombre=g('f-nombre').value.trim();
+  if(!nombre){alert('Escribe el nombre del prospecto para guardar.');return;}
+  const perfil=JSON.parse(localStorage.getItem('ml_perfil')||'{}');
+  const cita={
+    id:Date.now(),
+    fecha:new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}),
+    nombre,asesor:perfil.nombre||'—',
+    edad:g('f-edad').value||'—',trabajo:D['rg-trabajo']||'—',
+    proveedor:D['rg-proveedor']||'—',salud:D['rg-salud']||'—',
+    historial:D['rg-hist']||'—',ideal:D.ideal||0,minima:D.minima||0,
+    bIdeal:D.bIdeal||0,bMinima:D.bMinima||0,areas:(D.areas||[]),
+    presupuesto:g('f-presupuesto').value||'—',
+    segundaCita:g('f-segunda-cita').value.trim()||'Por confirmar',
+    obs:g('f-obs').value.trim()||''
+  };
+  citas.unshift(cita);
+  localStorage.setItem('ml_citas',JSON.stringify(citas));
+  alert('✓ Cita guardada para '+nombre);
+}
+
+function renderHistorial(){
+  const list=g('hist-list');
+  const empty=g('hist-empty');
+  if(!citas.length){empty.style.display='block';list.innerHTML='';return;}
+  empty.style.display='none';
+  const areaTextos={proteccion:'Protección familiar',salud:'Salud y emergencias',hijos:'Futuro de hijos',retiro:'Retiro',meta:'Meta personal',fondo:'Fondo propio'};
+  list.innerHTML=citas.map(c=>`
+    <div class="hist-card">
+      <div class="hist-card-header"><div class="hist-name">${c.nombre}</div><div class="hist-date">${c.fecha}</div></div>
+      <div class="hist-row"><strong>Asesor:</strong> ${c.asesor} · <strong>Edad:</strong> ${c.edad} · <strong>Trabajo:</strong> ${c.trabajo}</div>
+      <div class="hist-row"><strong>Sostén:</strong> ${c.proveedor} · <strong>Salud:</strong> ${c.salud}</div>
+      ${c.ideal>0?`<div class="hist-row"><strong>S.A. ideal:</strong> ${fmt(c.ideal)} · <strong>S.A. mínima:</strong> ${fmt(c.minima)}</div><div class="hist-row"><strong>Brecha ideal:</strong> ${fmt(c.bIdeal)} · <strong>Brecha mínima:</strong> ${fmt(c.bMinima)}</div>`:''}
+      <div class="hist-row"><strong>Interés:</strong> ${c.areas.map(a=>areaTextos[a]||a).join(' + ')||'—'}</div>
+      <div class="hist-row"><strong>Presupuesto:</strong> ${fmt(c.presupuesto)}/año · <strong>2ª cita:</strong> ${c.segundaCita}</div>
+      ${c.obs?`<div class="hist-row"><strong>Notas:</strong> ${c.obs}</div>`:''}
+      <div style="margin-top:8px;"><button class="btn sm" onclick="eliminarCita(${c.id})" style="color:#C0392B;border-color:#C0392B;">Eliminar</button></div>
+    </div>`).join('');
+}
+
+function eliminarCita(id){
+  if(!confirm('¿Eliminar esta cita?'))return;
+  citas=citas.filter(c=>c.id!==id);
+  localStorage.setItem('ml_citas',JSON.stringify(citas));
+  renderHistorial();
+}
+
+function nuevoCliente(){
+  document.querySelectorAll('#sistema input[type=text],#sistema input[type=number],#sistema textarea').forEach(i=>i.value='');
+  document.querySelectorAll('#sistema .rb').forEach(b=>b.classList.remove('on','red','green','gold'));
+  document.querySelectorAll('#sistema .chip').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('#sistema .ac').forEach(c=>{c.classList.remove('on');c.style.borderColor='';c.style.background='';});
+  g('hd').style.display='none';
+  g('st-campo').style.display='none';
+  g('sp-campo').style.display='none';
+  g('diag-wrap').style.display='none';
+  g('wa-output').style.display='none';
+  areasOk=[];areasP3=[];D={};
+  document.querySelectorAll('.pres-screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.area-card').forEach(c=>{c.classList.remove('selected');});
+  g('sel-counter').innerHTML='Selecciona <strong>1 o 2</strong> áreas';
+  g('p1').classList.add('active');
+  g('sistema').classList.remove('active');
+  window.scrollTo(0,0);
+}
+
+// Inicializar
+cargarPerfilGuardado();
+</script>
+</body>
+</html>
